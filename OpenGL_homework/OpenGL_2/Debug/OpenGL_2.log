@@ -1,0 +1,8 @@
+﻿  enemy3.cpp
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.cpp(8): warning C4244: '引數': 將 'double' 轉換為 'float'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.cpp(8): warning C4244: '引數': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.cpp(11): warning C4244: '引數': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.cpp(46): warning C4101: 'y': 未參考的區域變數
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.cpp(45): warning C4101: 'x': 未參考的區域變數
+  OpenGL_2.vcxproj -> C:\Users\USER\Desktop\計算機圖學\OpenGL_homework\Debug\OpenGL_2.exe
+  OpenGL_2.vcxproj -> C:\Users\USER\Desktop\計算機圖學\OpenGL_homework\Debug\OpenGL_2.pdb (Full PDB)
