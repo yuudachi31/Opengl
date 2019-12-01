@@ -56,16 +56,21 @@ bullet::bullet()
 }
 void bullet::Shoot(float bx, float by) {
 	BLoc[0] = bx; BLoc[1] = by;
-	printf("got");
+//	printf("got");
 }
 
 void bullet::Move(float dt) {
 	if (BLoc[1] < 13) {
 		BLoc[1] += 9 * dt;
-		Bfly = Translate(vec4(BLoc[0], BLoc[1], 0, 0));
+		Loc = vec4(BLoc[0], BLoc[1], 0, 0);
+		Bfly = Translate(Loc);
 		m_mxTRS = Bfly;
 		if (BLoc[1] > 13.0f)this->Exact = false;
 		m_bUpdateMV = true;
+	}
+	if (BLoc[1] > 13) {
+		Exact = false;
+		BLoc[1] = 40;
 	}
 }
 void bullet::animation(float &f1) {

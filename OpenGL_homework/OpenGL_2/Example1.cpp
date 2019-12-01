@@ -47,7 +47,7 @@ float g_TotTime = 0;
 float em2T = 0;//Enemy2 動畫
 float em2y = -1.6f;
 float em2x = 1.2f;//Enemy2移動
-float bgTime = 0;
+float bgTime = 0;   //背景計時
 float Em3A=0;//Enemy旋轉
 float bg_y = 12.0f; //背景
 float  g_fQuadT[2][3] = { 0 }; //不知
@@ -56,8 +56,10 @@ bool    m_bAutoRotation = false; // Controlled by Space Key
 float EnemyLoc[EnemyNum][3] = { 0 };     //Enemy1位置
 float Enemy2Loc[3] = { -7,10,0 };
 float Enemy3Loc[2][2] = { 0 };
-float cooldown = 1;
+
+float cooldown = 1;  //子彈冷卻
 GLfloat g_fTx = 0, g_fTy = 0;
+vec4 Enemyvec[4];   //Enemy位置
 //----------------------------------------------------------------------------
 // 函式的原型宣告
 void IdleProcess();
@@ -100,20 +102,23 @@ void BGmovingf(float dt) {
 }
 void EnemyMoving(float dt) {
 	mat4 EnemyTrans;
-	float Ex = 0;
-	Ex += 3.0f*dt;
-	if (Ex > 2*M_PI)Ex = 0;
+	
 	for (int i = 0; i < EnemyNum; i++) {
 		EnemyLoc[i][1] -= dt;
 		if (EnemyLoc[i][1] < -12) {
 			EnemyLoc[i][1] = 12.0f;
 		}
 		 
-			EnemyLoc[i][0] += 0.5f*sinf(Ex);
+		EnemyLoc[i][0] += dt;
 			if (EnemyLoc[i][0] > 12) {
 				EnemyLoc[i][0] = -12.0f;
 			}
-		EnemyTrans = Translate(vec4(EnemyLoc[i][0], EnemyLoc[i][1],0,0));
+			if (Enemy1[i]->EnemyHealth == 0) {
+				EnemyLoc[i][1] += 16.0f;
+				Enemy1[i]->EnemyHealth = 5;
+			}
+			Enemyvec[i] = vec4(EnemyLoc[i][0], EnemyLoc[i][1], 0, 0);
+		EnemyTrans = Translate(Enemyvec[i]);
 		Enemy1[i]->SetTRSMatrix(EnemyTrans);
 	}
 
@@ -130,7 +135,7 @@ void Enemy2Moving(float dt) {
 }
 void ColdT(float dt) {
 	if(cooldown < 1)cooldown += 5*dt;
-	if (cooldown > 1) { cooldown =1 ; printf("down"); }
+	if (cooldown > 1) { cooldown =1 ;/* printf("down")*/; }
 }
 void Enemy3Moving(float dt) {
 	
@@ -296,6 +301,22 @@ void shoot() {
 		cooldown = 0;
 	}
 }
+void HitOrNot(float dt) {
+	pget = phead;
+	while (pget != NULL) {
+		if (pget->Exact == true) {
+			for (int i = 0; i < EnemyNum; i++) {
+				if (pget->Loc.x < Enemyvec[i].x + 0.7f && pget->Loc.x  > Enemyvec[i].x - 0.7f && pget->Loc.y > Enemyvec[i].y - 0.7f&&pget->Loc.y < Enemyvec[i].y + 0.7f)
+				{
+					pget->Exact = false; printf("hit""\n");
+					Enemy1[i]->EnemyHealth -= 1;
+				}
+			}
+		}
+		pget = pget->Link;
+	}
+	
+}
 void GL_Display( void )
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the window
@@ -327,6 +348,7 @@ void GL_Display( void )
 
 void onFrameMove(float delta)
 {
+	HitOrNot(delta);
 	BGmovingf(delta);
 	EnemyAnimate(delta);
 	PropellerRotate(delta);

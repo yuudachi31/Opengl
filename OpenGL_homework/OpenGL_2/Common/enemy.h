@@ -33,7 +33,7 @@ public:
 	vec4 m_Points[QUAD_NUM];
 	vec4 m_Colors[QUAD_NUM];
 	enemy();
-
+	int EnemyHealth;//Enemy¦å¶q
 	void SetShader(mat4 &mxModelView, mat4 &mxProjection, GLuint uiShaderHandle=MAX_UNSIGNED_INT);
 	GLuint GetShaderHandle() { return m_uiProgram;}
 	void SetViewMatrix(mat4 &mat);

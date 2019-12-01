@@ -40,6 +40,7 @@ public:
 	void SetShader(mat4 &mxModelView, mat4 &mxProjection, GLuint uiShaderHandle=MAX_UNSIGNED_INT);
 	GLuint GetShaderHandle() { return m_uiProgram;}
 	void SetViewMatrix(mat4 &mat);
+	vec4 Loc;
 	void SetProjectionMatrix(mat4 &mat);
 	void SetTRSMatrix(mat4 &mat);
 	void SetColor(GLfloat vColor[4]); // Single color
