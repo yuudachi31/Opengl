@@ -12,11 +12,12 @@
 #include "Common/enemy2.h"
 #include "Common/enemy3.h"
 #include "Common/bullet.h"
+#include "Common/Ebullet.h"
 #define SPACE_KEY 32
 #define SCREEN_SIZE 800
 #define HALF_SIZE (SCREEN_SIZE/2) 
 #define VP_HALFWIDTH 12.0f
-#define EnemyNum 4
+#define EnemyNum 5
 #define BULLETNUM 20
 // 必須在 glewInit(); 執行完後,在執行物件實體的取得
 plane2 *Plane;
@@ -26,7 +27,7 @@ enemy *Enemy1[EnemyNum];
 enemy2 *Enemy2;
 enemy3 *Enemy3[2];
 bullet *phead,*pget,*ptail,*puse;
-
+Ebullet *Ehead, *Eget, *Etail;
 // For Model View and Projection Matrix
 mat4 mxT, mxRot;
 mat4 Em3R;
@@ -58,6 +59,8 @@ float Enemy2Loc[3] = { -7,10,0 };
 float Enemy3Loc[2][2] = { 0 };
 
 float cooldown = 1;  //子彈冷卻
+float Enemy1coldT = 0; //Enemy冷卻
+float Enemy3coldT = 0; //Enemy3冷卻
 GLfloat g_fTx = 0, g_fTy = 0;
 vec4 Enemyvec[4];   //Enemy位置
 //----------------------------------------------------------------------------
@@ -70,7 +73,7 @@ void CreateEnemy2();
 void CreateEnemy3();
 void CreateBackground();
 void CreateBullet();
-
+void Eshoot();
 void init( void )
 {
 	// 必須在 glewInit(); 執行完後,在執行物件實體的取得
@@ -114,7 +117,7 @@ void EnemyMoving(float dt) {
 				EnemyLoc[i][0] = -12.0f;
 			}
 			if (Enemy1[i]->EnemyHealth == 0) {
-				EnemyLoc[i][1] += 16.0f;
+				EnemyLoc[i][1] += 28.0f;
 				Enemy1[i]->EnemyHealth = 5;
 			}
 			Enemyvec[i] = vec4(EnemyLoc[i][0], EnemyLoc[i][1], 0, 0);
@@ -151,6 +154,13 @@ void Enemy3Moving(float dt) {
 	mEnemy3Move = Translate(vec4(Enemy3Loc[1][0], Enemy3Loc[1][1], 0, 0));
 	Enemy3[1]->SetTRSMatrix(mEnemy3Move*Em3R);
 }
+void EnemyST(float dt) {
+	Enemy1coldT += dt;
+		if (Enemy1coldT > 1) {
+			Eshoot();
+			Enemy1coldT = 0;
+		}
+}
 void EnemyAnimate(float dt) {
 	
 	
@@ -164,7 +174,18 @@ void EnemyAnimate(float dt) {
 		if (em2T > 2 * M_PI)em2T = 0;
 	Enemy2->animation(em2T);
 }
-
+void bulletMOVE(float dt) {
+	pget = phead;
+	for (int i = 0; i < BULLETNUM; i++) {
+		if (pget->Exact == true)pget->Move(dt);
+		pget = pget->Link;
+	}
+	Eget = Ehead;
+	for (int i = 0; i < 50; i++) {
+		if (Eget->Exact == true)Eget->Move(dt, g_fTx, g_fTy);
+		Eget = Eget->Link;
+	}
+}
 void PropellerRotate(float dt){
 	
 	vec4 vT[2];
@@ -233,9 +254,9 @@ void CreateEnemy3() {
 		Enemy3[i]->SetShader(g_mxModelView, g_mxProjection);
 
 	}
-	Enemy3Loc[0][0] = -9.5f;
+	Enemy3Loc[0][0] = -10.5f;
 	Enemy3Loc[0][1] = 12.0f;
-	Enemy3Loc[1][0] = 9.5f;
+	Enemy3Loc[1][0] = 10.5f;
 	Enemy3Loc[1][1] = 12.0f;
 }
 void CreatePlayer()
@@ -287,6 +308,20 @@ void CreateBullet() {
 		
 	}
 	pget = phead;
+	//create EnemyBullet
+	Ehead = new Ebullet; Ehead->Link = NULL;
+	Etail = Ehead;
+	Etail->SetShader(g_mxModelView, g_mxProjection);
+	for (int i = 0; i < 50; i++) {
+		Eget = new Ebullet; Eget->Link = NULL;
+		Etail->Exact = false;
+		Etail->Link = Eget;
+		Etail = Eget;
+		Etail->SetShader(g_mxModelView, g_mxProjection);
+
+
+	}
+	Eget = Ehead;
 	
 }
 void shoot() {
@@ -301,6 +336,31 @@ void shoot() {
 		cooldown = 0;
 	}
 }
+void Eshoot() {
+	for (int i = 0; i < EnemyNum; i++) {
+		if (Enemyvec[i].y < 12.5f) {
+			Eget = Ehead;
+			while (Eget->Exact == true) {
+				Eget = Eget->Link;
+			}
+			Eget->Shoot(Enemyvec[i].x, Enemyvec[i].y, g_fTx, g_fTy);
+			Eget->Exact = true;
+			Eget->E3Use = false;
+		}
+	}
+	for (int i = 0; i < 2; i++) {
+		Eget = Ehead;
+		while (Eget->Exact == true) {
+			Eget = Eget->Link;
+		}
+		Eget->Shoot(Enemy3Loc[i][0], Enemy3Loc[i][1], g_fTx, g_fTy);
+		Eget->Exact = true;
+		Eget->E3Use = true;
+}
+	
+}
+
+
 void HitOrNot(float dt) {
 	pget = phead;
 	while (pget != NULL) {
@@ -312,6 +372,8 @@ void HitOrNot(float dt) {
 					Enemy1[i]->EnemyHealth -= 1;
 				}
 			}
+
+
 		}
 		pget = pget->Link;
 	}
@@ -339,7 +401,12 @@ void GL_Display( void )
 		pget->DrawW();
 		pget = pget->Link;
 	}
-		
+	Eget = Ehead;
+	while (Eget != NULL) {              
+		if (Eget->Exact == true)
+			Eget->DrawW();
+		Eget = Eget->Link;
+	}
 	
 		
 		
@@ -348,19 +415,17 @@ void GL_Display( void )
 
 void onFrameMove(float delta)
 {
-	HitOrNot(delta);
-	BGmovingf(delta);
-	EnemyAnimate(delta);
-	PropellerRotate(delta);
-	EnemyMoving(delta);
+	HitOrNot(delta); //擊中與否
+	BGmovingf(delta);  //背景移動
+	EnemyAnimate(delta);  //Enemy動畫
+	PropellerRotate(delta); //螺旋槳
+	EnemyMoving(delta); 
 	Enemy2Moving(delta);
 	Enemy3Moving(delta);
-	ColdT(delta);
-	pget = phead;
-	for (int i = 0; i < BULLETNUM; i++) {
-		if (pget->Exact == true)pget->Move(delta);
-		pget = pget->Link;
-	}
+	ColdT(delta); //發射冷卻
+	EnemyST(delta);  //敵人射擊
+	bulletMOVE(delta); //子彈移動
+	
 
 	GL_Display();
 }
@@ -425,7 +490,7 @@ void Win_Mouse(int button, int state, int x, int y) {
 	switch(button) {
 		case GLUT_LEFT_BUTTON:   // 目前按下的是滑鼠左鍵
 			if ( state == GLUT_DOWN ) {  // 目前的滑鼠狀態是按住，換成 X 軸
-				shoot();
+				shoot();// Eshoot();
 			}
 			break;
 		case GLUT_MIDDLE_BUTTON:  // 目前按下的是滑鼠中鍵 ，換成 Y 軸

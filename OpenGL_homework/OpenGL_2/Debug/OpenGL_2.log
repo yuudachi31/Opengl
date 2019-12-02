@@ -1,4 +1,12 @@
-﻿  Example1.cpp
+﻿  enemy.cpp
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.cpp(8): warning C4244: '引數': 將 'double' 轉換為 'float'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.cpp(8): warning C4244: '引數': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.cpp(11): warning C4244: '引數': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.cpp(47): warning C4101: 'y': 未參考的區域變數
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.cpp(46): warning C4101: 'x': 未參考的區域變數
+  正在產生程式碼...
+  正在編譯...
+  Example1.cpp
 c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\propeller.h(13): warning C4305: '引數': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
 c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\plane2.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
   c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\cquad.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
@@ -7,17 +15,21 @@ c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.h(8)
   c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\plane2.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
 c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy2.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
   c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.h(7): warning C4005: 'CornerNUM': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.h(7): note: 請參閱 'CornerNUM' 之前的定義
 c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
   c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy2.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
 c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\bullet.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
   c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(142): warning C4244: '=': 將 'double' 轉換為 'float'，由於類型不同，可能導致資料遺失
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(205): warning C4101: 'uiShaderHandle': 未參考的區域變數
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(230): warning C4101: 'uiShaderHandle': 未參考的區域變數
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(276): warning C4101: 'uiShaderHandle': 未參考的區域變數
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(418): warning C4156: 刪除陣列運算式沒有使用陣列形式的 'delete'; 改用陣列形式
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(418): warning C4154: 不能在陣列運算式上使用 delete; 所以將陣列轉換成指標
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\ebullet.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
+  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\bullet.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(145): warning C4244: '=': 將 'double' 轉換為 'float'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(226): warning C4101: 'uiShaderHandle': 未參考的區域變數
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(251): warning C4101: 'uiShaderHandle': 未參考的區域變數
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(297): warning C4101: 'uiShaderHandle': 未參考的區域變數
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(483): warning C4156: 刪除陣列運算式沒有使用陣列形式的 'delete'; 改用陣列形式
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(483): warning C4154: 不能在陣列運算式上使用 delete; 所以將陣列轉換成指標
+  enemy2.cpp
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy2.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
+  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
+  正在產生程式碼...
   OpenGL_2.vcxproj -> C:\Users\USER\Desktop\計算機圖學\OpenGL_homework\Debug\OpenGL_2.exe
   OpenGL_2.vcxproj -> C:\Users\USER\Desktop\計算機圖學\OpenGL_homework\Debug\OpenGL_2.pdb (Full PDB)

@@ -24,7 +24,7 @@ enemy::enemy()
 	// Create and initialize a buffer object 
 	CreateBufferObject();
 	m_bUpdateProj = false;
-	 EnemyHealth = 5;//Enemy¦å¶q
+	 EnemyHealth = 10;//Enemy¦å¶q
 }
 
 

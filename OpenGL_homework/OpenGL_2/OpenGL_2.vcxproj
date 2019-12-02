@@ -82,6 +82,7 @@
     <ClCompile Include="Common\common.cpp" />
     <ClCompile Include="Common\CQuad.cpp" />
     <ClCompile Include="Common\Background1.cpp" />
+    <ClCompile Include="Common\Ebullet.cpp" />
     <ClCompile Include="Common\enemy.cpp" />
     <ClCompile Include="Common\enemy2.cpp" />
     <ClCompile Include="Common\enemy3.cpp" />
@@ -96,6 +97,7 @@
     <ClInclude Include="Common\bullet.h" />
     <ClInclude Include="Common\CQuad.h" />
     <ClInclude Include="Common\Background1.h" />
+    <ClInclude Include="Common\Ebullet.h" />
     <ClInclude Include="Common\enemy.h" />
     <ClInclude Include="Common\enemy2.h" />
     <ClInclude Include="Common\enemy3.h" />
