@@ -13,6 +13,10 @@
 #include "Common/enemy3.h"
 #include "Common/bullet.h"
 #include "Common/Ebullet.h"
+#include "Common/fire.h"
+#include "Common/Boss.h"
+#include "Common/BossEye.h"
+#include "Common/GuidedMissile.h"
 #define SPACE_KEY 32
 #define SCREEN_SIZE 800
 #define HALF_SIZE (SCREEN_SIZE/2) 
@@ -26,8 +30,12 @@ Propeller *g_pQuad[2];	// 宣告 Quad 指標物件，結束時記得釋放
 enemy *Enemy1[EnemyNum];
 enemy2 *Enemy2;
 enemy3 *Enemy3[2];
+Boss *boss1;
+BossEye *eye;
 bullet *phead,*pget,*ptail,*puse;
 Ebullet *Ehead, *Eget, *Etail;
+GuidedMissile *Mhead, *Mget, *Mtail;
+fire *Fhead, *Fget, *Ftail;
 // For Model View and Projection Matrix
 mat4 mxT, mxRot;
 mat4 Em3R;
@@ -54,13 +62,19 @@ float bg_y = 12.0f; //背景
 float  g_fQuadT[2][3] = { 0 }; //不知
 float Aangel = 0;//敵人動畫
 bool    m_bAutoRotation = false; // Controlled by Space Key
+bool E3L[2]; //Enemy3存活
+bool BossOk = false;
+bool BossL = true;//Boss存活
 float EnemyLoc[EnemyNum][3] = { 0 };     //Enemy1位置
 float Enemy2Loc[3] = { -7,10,0 };
 float Enemy3Loc[2][2] = { 0 };
-
+float BossLoc[2];
+float TIME=0;//總時間
 float cooldown = 1;  //子彈冷卻
+float Mcooldown = 1;//飛彈冷卻
 float Enemy1coldT = 0; //Enemy冷卻
 float Enemy3coldT = 0; //Enemy3冷卻
+float BossCold = 0;
 GLfloat g_fTx = 0, g_fTy = 0;
 vec4 Enemyvec[4];   //Enemy位置
 //----------------------------------------------------------------------------
@@ -73,7 +87,11 @@ void CreateEnemy2();
 void CreateEnemy3();
 void CreateBackground();
 void CreateBullet();
+void CreateBoss();
+void BossShoot();
 void Eshoot();
+void Mshoot();
+
 void init( void )
 {
 	// 必須在 glewInit(); 執行完後,在執行物件實體的取得
@@ -89,6 +107,7 @@ void init( void )
 	CreateEnemy3();
 	CreatePlayer();
 	CreateBullet();
+	CreateBoss();
 		glClearColor( 0.0, 0.0, 0.0, 1.0); // black background
 }
 
@@ -137,7 +156,11 @@ void Enemy2Moving(float dt) {
 	Enemy2->SetTRSMatrix(mEnemy2Move);
 }
 void ColdT(float dt) {
-	if(cooldown < 1)cooldown += 5*dt;
+	Mcooldown +=  4*dt;
+	if (Mcooldown > 5) {
+		Mcooldown = 5;
+	}
+	if(cooldown < 1)cooldown += 7*dt;
 	if (cooldown > 1) { cooldown =1 ;/* printf("down")*/; }
 }
 void Enemy3Moving(float dt) {
@@ -149,10 +172,14 @@ void Enemy3Moving(float dt) {
 	if (Enemy3Loc[1][1] < -12.0f)Enemy3Loc[1][1] = 12.0f;
 	Enemy3Loc[0][1] -= 2.5f*dt;
 	Enemy3Loc[1][1] -= 2.5f*dt;
-	mEnemy3Move = Translate(vec4(Enemy3Loc[0][0], Enemy3Loc[0][1], 0, 0));
-	Enemy3[0]->SetTRSMatrix(mEnemy3Move*Em3R);
-	mEnemy3Move = Translate(vec4(Enemy3Loc[1][0], Enemy3Loc[1][1], 0, 0));
-	Enemy3[1]->SetTRSMatrix(mEnemy3Move*Em3R);
+	if (E3L[0] == true) {
+		mEnemy3Move = Translate(vec4(Enemy3Loc[0][0], Enemy3Loc[0][1], 0, 0));
+		Enemy3[0]->SetTRSMatrix(mEnemy3Move*Em3R);
+	}
+	if (E3L[1] == true) {
+		mEnemy3Move = Translate(vec4(Enemy3Loc[1][0], Enemy3Loc[1][1], 0, 0));
+		Enemy3[1]->SetTRSMatrix(mEnemy3Move*Em3R);
+	}
 }
 void EnemyST(float dt) {
 	Enemy1coldT += dt;
@@ -180,10 +207,23 @@ void bulletMOVE(float dt) {
 		if (pget->Exact == true)pget->Move(dt);
 		pget = pget->Link;
 	}
+
 	Eget = Ehead;
 	for (int i = 0; i < 50; i++) {
 		if (Eget->Exact == true)Eget->Move(dt, g_fTx, g_fTy);
 		Eget = Eget->Link;
+	}
+	Mget = Mhead;
+
+	for (int i = 0; i < BULLETNUM; i++) {
+		if (Mget->Exact == true)Mget->Move(dt, boss1->Bx, boss1->By);
+		Mget = Mget->Link;
+	}
+
+	Fget = Fhead;
+	for (int i = 0; i < 40; i++) {
+		if (Fget->Exact == true)Fget->Move(dt);
+		Fget = Fget->Link;
 	}
 }
 void PropellerRotate(float dt){
@@ -200,17 +240,50 @@ void PropellerRotate(float dt){
 		mxT = Translate(vT[i]);
 		g_pQuad[i]->SetTRSMatrix(mxGT*mxT*mxRot);
 	}
-
+	if (Plane->PlaneHealth == 0) {
+		Plane->DeadC();
+		Plane->PlaneHealth = -1;
+	}
 	//g_fAngle += g_fDir * 1.0f;     // 旋轉角度遞增(遞減) 0.125 度
 	//if( g_fAngle > 360.0 ) g_fAngle -= 360;
 	//else if (g_fAngle < 0.0) g_fAngle += 360.0;
 	//else ;
-
 	//// 計算旋轉矩陣並更新到 Shader 中
-	
-
-
 	//glutPostRedisplay();     // 目前的視窗需要被重畫
+}
+void bossCtrl(float dt) {
+	TIME += dt;
+	if (TIME > 23 && TIME < 25) {
+		BossLoc[1] -= 3*dt;
+		boss1->SetTRSMatrix(Translate(vec4(BossLoc[0], BossLoc[1], 0, 1.0))*Em3R);
+		eye->SetTRSMatrix(Translate(vec4(BossLoc[0], BossLoc[1], 0, 1.0)));
+	}
+	if (TIME >= 25) {
+		BossOk = true;
+		boss1->Move(dt);
+		eye->Move(dt,boss1->BossMode);
+			BossCold += dt;
+			if (boss1->BossMode == 1) {
+				if (BossCold > 1) {
+					BossShoot();
+					BossCold = 0;
+				}
+			}
+			if (boss1->BossMode == 2 || boss1->BossMode == 3) {
+				if (eye->EyeC == false) { eye->ChangeColor(); eye->EyeC = true; }
+				if (BossCold > 0.3) {
+					BossShoot();
+					BossCold = 0;
+				}
+			}
+			if (boss1->BossMode == 3) {
+				if (boss1->BossC == false) { boss1->ChangeColor(); boss1->BossC = true; }
+				glClearColor(0.2, 0.0, 0.0, 1.0);
+			}
+
+	}
+	
+	
 }
 //----------------------------------------------------------------------------
 void CreateBackground()
@@ -252,12 +325,13 @@ void CreateEnemy3() {
 	for (int i = 0; i < 2; i++) {
 		Enemy3[i] = new enemy3;
 		Enemy3[i]->SetShader(g_mxModelView, g_mxProjection);
-
+		E3L[i] = true;
 	}
 	Enemy3Loc[0][0] = -10.5f;
 	Enemy3Loc[0][1] = 12.0f;
 	Enemy3Loc[1][0] = 10.5f;
 	Enemy3Loc[1][1] = 12.0f;
+
 }
 void CreatePlayer()
 {
@@ -308,11 +382,27 @@ void CreateBullet() {
 		
 	}
 	pget = phead;
+
+	//Create GuidedMissile
+	Mhead = new GuidedMissile; Mhead->Link = NULL;
+	Mtail = Mhead;
+	Mtail->SetShader(g_mxModelView, g_mxProjection);
+	for (int i = 0; i < BULLETNUM; i++) {
+		Mget = new GuidedMissile; Mget->Link = NULL;
+		Mtail->Exact = false;
+		Mtail->Link = Mget;
+		Mtail = Mget;
+		Mtail->SetShader(g_mxModelView, g_mxProjection);
+
+
+	}
+	Mget = Mhead;
+
 	//create EnemyBullet
 	Ehead = new Ebullet; Ehead->Link = NULL;
 	Etail = Ehead;
 	Etail->SetShader(g_mxModelView, g_mxProjection);
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < 60; i++) {
 		Eget = new Ebullet; Eget->Link = NULL;
 		Etail->Exact = false;
 		Etail->Link = Eget;
@@ -323,6 +413,31 @@ void CreateBullet() {
 	}
 	Eget = Ehead;
 	
+	//Creat fire
+	
+	Fhead = new fire; Fhead->Link = NULL;
+	Ftail = Fhead;
+	Ftail->SetShader(g_mxModelView, g_mxProjection);
+	for (int i = 0; i < 40; i++) {
+		Fget = new fire; Fget->Link = NULL;
+		Ftail->Exact = false;
+		Ftail->Link = Fget;
+		Ftail = Fget;
+		Ftail->SetShader(g_mxModelView, g_mxProjection);
+
+	}
+	Fget = Fhead;
+}
+void CreateBoss() {
+	GLuint uiShaderHandle;
+	
+	boss1 = new Boss;
+			boss1->SetShader(g_mxModelView, g_mxProjection);
+	
+			eye = new BossEye;
+			eye->SetShader(g_mxModelView, g_mxProjection);
+			BossLoc[0] = 0;
+			BossLoc[1] = 15;
 }
 void shoot() {
 	pget = phead;
@@ -335,6 +450,28 @@ void shoot() {
 		pget->Exact = true;
 		cooldown = 0;
 	}
+}
+void Mshoot() {
+	Mget = Mhead;
+	while (Mget->Exact == true) {
+		Mget = Mget->Link;
+	}
+
+	if (Mcooldown > 3) {
+		Mget->Shoot(g_fTx, g_fTy);
+		Mget->Exact = true;
+		Mcooldown = 0;
+	}
+}
+void Fire(float fx,float fy) {
+	Fget = Fhead;
+	while (Fget->Exact == true) {
+		Fget = Fget->Link;
+	}
+	
+		Fget->Shoot(fx, fy);
+		Fget->Exact = true;
+		
 }
 void Eshoot() {
 	for (int i = 0; i < EnemyNum; i++) {
@@ -349,35 +486,99 @@ void Eshoot() {
 		}
 	}
 	for (int i = 0; i < 2; i++) {
+		if (E3L[i] == true) {
+			Eget = Ehead;
+			while (Eget->Exact == true) {
+				Eget = Eget->Link;
+			}
+			Eget->Shoot(Enemy3Loc[i][0], Enemy3Loc[i][1], g_fTx, g_fTy);
+			Eget->Exact = true;
+			Eget->E3Use = true;
+		}
+}
+	
+}
+void BossShoot() {
+	if (BossL == true) {
 		Eget = Ehead;
 		while (Eget->Exact == true) {
 			Eget = Eget->Link;
 		}
-		Eget->Shoot(Enemy3Loc[i][0], Enemy3Loc[i][1], g_fTx, g_fTy);
+		Eget->Shoot(boss1->Bx, boss1->By, g_fTx, g_fTy);
 		Eget->Exact = true;
 		Eget->E3Use = true;
+	}
 }
-	
-}
-
-
+float crashCD = 0;
 void HitOrNot(float dt) {
+	crashCD += dt; if (crashCD > 3)crashCD = 3.0f;
+	if (boss1->Bx - 2.0f < g_fTx + 1.0f && boss1->Bx + 2.0f  > g_fTx - 1.0f  && boss1->By + 2.0f > g_fTy - 0.2f && boss1->By - 2.0f < g_fTy + 0.6f) {
+		if (crashCD > 1.5) { 
+			printf("OMG"); crashCD = 0;
+		}
+	}
 	pget = phead;
 	while (pget != NULL) {
 		if (pget->Exact == true) {
 			for (int i = 0; i < EnemyNum; i++) {
 				if (pget->Loc.x < Enemyvec[i].x + 0.7f && pget->Loc.x  > Enemyvec[i].x - 0.7f && pget->Loc.y > Enemyvec[i].y - 0.7f&&pget->Loc.y < Enemyvec[i].y + 0.7f)
 				{
+					Fire(pget->Loc.x, pget->Loc.y);
 					pget->Exact = false; printf("hit""\n");
 					Enemy1[i]->EnemyHealth -= 1;
 				}
 			}
-
+			for (int i = 0; i < 2; i++) {
+				if (pget->Loc.x < Enemy3Loc[i][0] + 0.7f && pget->Loc.x  > Enemy3Loc[i][0] - 0.7f && pget->Loc.y > Enemy3Loc[i][1] - 0.7f&&pget->Loc.y < Enemy3Loc[i][1] + 0.7f)
+				{
+					Fire(pget->Loc.x, pget->Loc.y);
+					pget->Exact = false; printf("hit""\n");
+					Enemy3[i]->EnemyHealth -= 1;
+					if (Enemy3[i]->EnemyHealth < 0) { E3L[i] = false; }
+				}
+			}
+			if (pget->Loc.x < boss1->Bx + 2.0f && pget->Loc.x  > boss1->Bx - 2.0f && pget->Loc.y > boss1->By - 2.0f && pget->Loc.y < boss1->By + 2.0f) {
+				Fire(pget->Loc.x, pget->Loc.y);
+				pget->Exact = false; printf("yolo""\n");
+				boss1->BossHealth -= 1;
+				if (boss1->BossHealth < 16) { boss1->BossK(); }
+				if (boss1->BossHealth < 0) { BossL = false; printf("bossdead""\n");
+				delete boss1;
+				delete eye;
+				glClearColor(1.0f, 0.8, 0.3, 1.0);
+				}
+			}
 
 		}
 		pget = pget->Link;
 	}
-	
+	Eget = Ehead;
+	while (Eget != NULL) {
+		if (Eget->Exact == true) {
+				if (Eget->Loc.x < g_fTx + 1.0f && Eget->Loc.x  > g_fTx-1.0f  && Eget->Loc.y > g_fTy - 0.2f && Eget->Loc.y < g_fTy + 0.6f)
+				{
+					Fire(Eget->Loc.x, Eget->Loc.y);
+					Eget->Exact = false; printf("owo""\n");
+					Plane->PlaneHealth -= 1;
+				}
+			
+		}
+		Eget = Eget->Link;
+	}
+	Mget = Mhead;
+	while (Mget != NULL) {
+		if (Mget->Exact == true) {
+			if (Mget->Loc.x-0.3f < boss1->Bx + 2.0f && Mget->Loc.x + 0.3f  > boss1->Bx - 2.0f  && Mget->Loc.y + 0.3f > boss1->By - 2.0f && Mget->Loc.y - 0.3f <boss1->By + 2.0f)
+			{
+				Fire(Mget->Loc.x, Mget->Loc.y);
+				Mget->Exact = false; printf("bang""\n");
+				boss1->BossHealth -= 2;
+			}
+
+		}
+		Mget = Mget->Link;
+	}
+
 }
 void GL_Display( void )
 {
@@ -387,16 +588,17 @@ void GL_Display( void )
 		Enemy1[i]->DrawW();
 	}
 	Enemy2->DrawW();
-	Enemy3[0]->DrawW();
-	Enemy3[1]->DrawW();
+	if(E3L[0] == true)Enemy3[0]->DrawW();
+	if (E3L[1] == true)Enemy3[1]->DrawW();
 	Plane->DrawW();
 	g_pQuad[0]->DrawW();
 	g_pQuad[1]->DrawW();
-	
-	
-
+	if (TIME > 20 && BossOk == true) {
+		boss1->DrawW();
+		eye->DrawW();
+	}
 	pget = phead;
-	while (pget != NULL) {               //參考自洪欣儀110619018
+	while (pget != NULL) {               //此迴圈參考自洪欣儀110619018
 		if(pget->Exact==true)
 		pget->DrawW();
 		pget = pget->Link;
@@ -407,7 +609,18 @@ void GL_Display( void )
 			Eget->DrawW();
 		Eget = Eget->Link;
 	}
-	
+	Mget = Mhead;
+	while (Mget != NULL) {
+		if (Mget->Exact == true)
+			Mget->DrawW();
+		Mget = Mget->Link;
+	}
+	Fget = Fhead;
+	while (Fget != NULL) {
+		if (Fget->Exact == true)
+			Fget->DrawW();
+		Fget = Fget->Link;
+	}
 		
 		
 	glutSwapBuffers();	// 交換 Frame Buffer
@@ -415,6 +628,9 @@ void GL_Display( void )
 
 void onFrameMove(float delta)
 {
+	if (BossL == true) {
+		bossCtrl(delta);
+	}
 	HitOrNot(delta); //擊中與否
 	BGmovingf(delta);  //背景移動
 	EnemyAnimate(delta);  //Enemy動畫
@@ -473,7 +689,12 @@ void Win_Keyboard( unsigned char key, int x, int y )
 		break;
 	case 68: // D key
 	case 100: // d key
-		g_fDir = -1 * g_fDir;
+		if (Plane->md2 == true && Plane->md3 == true) {
+			if (BossOk == true) {
+				Mshoot();
+				printf("jj");
+			}
+		}
 		break;
 	case 82: // R key
 	case 114: // r key

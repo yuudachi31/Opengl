@@ -1,33 +1,65 @@
-#include "enemy3.h"
+#include "GuidedMissile.h"
 
-enemy3::enemy3()
+GuidedMissile::GuidedMissile()
 {
-	NUM = CornerNUM;
-		m_Points[0] = vec4(0.0, -0.2f, 0.0,1.0f);
-		for (int i = 0; i <= CornerNUM-1 ; i++) {
-			m_Points[i+1] = vec4(Radius * cosf(2.0f*M_PI * i / CornerNUM), Radius*sinf(2.0f*M_PI * i / CornerNUM), 0.0, 1.0f);
-			
-		}
-		m_Points[CornerNUM+1] = vec4(Radius*cosf(2.0f*M_PI * 0), Radius*sinf(2.0f*M_PI * 0), 0.0, 1.0f);
+	OnUse = false;
+	Exact = false;
+	for (int i = 0; i < corner; i++) {
+		m_Points[3 * i] = vec4(0, 0, 0, 1.0f);
+		m_Points[3 * i + 1] = vec4( RADIUS * cosf(M_PI*2.0f* i / corner),  RADIUS * sinf(M_PI*2.0f* i / corner), 0, 1.0f);
+		m_Points[3 * i + 2] = vec4(RADIUS * cosf(M_PI*2.0f* (i + 1) / corner),  RADIUS * sinf(M_PI*2.0f* (i + 1) / corner), 0, 1.0f);
 
-	m_Colors[0] = vec4(1.7f, 0.2f, 0.4f, 1.0);
-	for (int i = 1; i <= CornerNUM + 1; i++)
-	{
-		m_Colors[i]= vec4(1.0f, 1.0f, 1.0f, 0.5f);
 	}
-	EnemyHealth =70;//Enemy¦å¶q
-	/*m_Colors[0] = vec4(3.2f, 2.0f, 1.5f, 1.0);
-	for (int i = 1; i <= CornerNUM + 1; i++)
+	for (int i = 0; i < corner; i++)
 	{
-		m_Colors[i] = vec4(i*0.1f + 0.1f, 1.0f / i, 1.0f, 0.5f);
-	}*/
+		m_Colors[3 * i] = vec4(0.1f, 0.4f, 0.5f, 1.0);
+		m_Colors[3 * i + 1] = vec4(0.1f, 0.4f, 0.5f, 1.0);
+		m_Colors[3 * i + 2] = vec4(0.1f, 0.2f, 0.5f, 1.0);
+	}
+
+	
+	Link = NULL;
+	
 	// Create and initialize a buffer object 
 	CreateBufferObject();
 	m_bUpdateProj = false;
 }
+void GuidedMissile::Shoot(float bx, float by) {
+	BLoc[0] = bx; BLoc[1] = by;
+//	printf("got");
+}
 
+void  GuidedMissile::Move(float dt, float px, float py) {
+	
+		if (BLoc[0] < 13 && BLoc[0]>-13 && BLoc[1]<13 && BLoc[1] > -13) {
+			ax = (px - BLoc[0]) / sqrt(pow((px - BLoc[0]), 2) + pow((py - BLoc[1]), 2));
+			ay = (py - BLoc[1]) / sqrt(pow((px - BLoc[0]), 2) + pow((py - BLoc[1]), 2));
+			BLoc[0] += ax*dt * 22; BLoc[1] += ay*dt * 22;
+			Loc = vec4(BLoc[0], BLoc[1], 0, 0);
+			Bfly = Translate(Loc);
+			m_mxTRS = Bfly;
+		
+	}
+	if (BLoc[0] > 13 || BLoc[0] < -13 || BLoc[1] > 13 || BLoc[1] < -13) {
+		Exact = false;
+		BLoc[1] = -40;
+	}
+	m_bUpdateMV = true;
+}
+	
 
-void enemy3::CreateBufferObject()
+void GuidedMissile::animation(float &f1) {
+
+	m_Points[1] = vec4(0.8f + 0.2f*f1, 1.2f + 0.2*f1, 0.0f, 1.0f);
+	m_Points[2] = vec4(0.8f + 0.2*f1, -1.2f + 0.2f*f1, 0.0f, 1.0f);
+	m_Points[4] = vec4(-0.8f + 0.2f*f1, 1.2f + 0.2f*f1, 0.0f, 1.0f);
+	m_Points[5] = vec4(-0.8f + 0.2f*f1, -1.2f + 0.2f*f1, 0.0f, 1.0f);
+	
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points);
+}
+void GuidedMissile::CreateBufferObject()
 {
     glGenVertexArrays( 1, &m_uiVao );
     glBindVertexArray( m_uiVao );
@@ -41,18 +73,8 @@ void enemy3::CreateBufferObject()
     glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points ); 
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
-void enemy3::animation(float &f1) {
-	float x;
-	float y;
-	
-	
-		m_Points[0].x =0.5f* cosf(f1);
-		m_Points[0].y =0.2f* sinf(f1);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points);
-}
-void enemy3::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
+
+void GuidedMissile::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
 {
     // Load shaders and use the resulting shader program
 	if( uiShaderHandle == MAX_UNSIGNED_INT) m_uiProgram = InitShader("vsVtxColor.glsl", "fsVtxColor.glsl");
@@ -77,25 +99,25 @@ void enemy3::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void enemy3::SetViewMatrix(mat4 &mat)
+void GuidedMissile::SetViewMatrix(mat4 &mat)
 {
 	m_mxView = mat;
 	m_bUpdateMV = true;
 }
 
-void enemy3::SetProjectionMatrix(mat4 &mat)
+void GuidedMissile::SetProjectionMatrix(mat4 &mat)
 {
 	m_mxProjection = mat;
 	m_bUpdateProj = true;
 }
 
-void enemy3::SetTRSMatrix(mat4 &mat)
+void GuidedMissile::SetTRSMatrix(mat4 &mat)
 {
 	m_mxTRS = mat;
 	m_bUpdateMV = true;
 }
 
-void enemy3::SetColor(GLfloat vColor[4])
+void GuidedMissile::SetColor(GLfloat vColor[4])
 {
 	for( int i = 0 ; i < 6 ; i++ ) {
 		m_Colors[i].x = vColor[0];
@@ -107,7 +129,7 @@ void enemy3::SetColor(GLfloat vColor[4])
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
 
-void enemy3::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[])
+void GuidedMissile::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[])
 {
 	m_Colors[0].x = vLFColor[0];
 	m_Colors[0].y = vLFColor[1];
@@ -135,7 +157,7 @@ void enemy3::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRCol
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
 
-void enemy3::Draw()
+void GuidedMissile::Draw()
 {
 	glUseProgram( m_uiProgram );
 	glBindVertexArray( m_uiVao );
@@ -149,10 +171,10 @@ void enemy3::Draw()
 		glUniformMatrix4fv( m_uiProjection, 1, GL_TRUE, m_mxProjection );
 		m_bUpdateProj = false;
 	}
-	glDrawArrays( GL_TRIANGLE_FAN, 0, QUAD_NUM );
+	glDrawArrays( GL_TRIANGLES, 0, QUAD_NUM );
 }
 
-void enemy3::DrawW()
+void GuidedMissile::DrawW()
 {
 	glBindVertexArray( m_uiVao );
 
@@ -166,5 +188,5 @@ void enemy3::DrawW()
 		glUniformMatrix4fv( m_uiProjection, 1, GL_TRUE, m_mxProjection );
 		m_bUpdateProj = false;
 	}
-	glDrawArrays( GL_TRIANGLE_FAN, 0, QUAD_NUM );
+	glDrawArrays( GL_TRIANGLES, 0, QUAD_NUM );
 }

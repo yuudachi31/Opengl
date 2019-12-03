@@ -1,21 +1,26 @@
-#include "enemy3.h"
+#include "Boss.h"
 
-enemy3::enemy3()
+Boss::Boss()
 {
-	NUM = CornerNUM;
-		m_Points[0] = vec4(0.0, -0.2f, 0.0,1.0f);
-		for (int i = 0; i <= CornerNUM-1 ; i++) {
-			m_Points[i+1] = vec4(Radius * cosf(2.0f*M_PI * i / CornerNUM), Radius*sinf(2.0f*M_PI * i / CornerNUM), 0.0, 1.0f);
-			
-		}
-		m_Points[CornerNUM+1] = vec4(Radius*cosf(2.0f*M_PI * 0), Radius*sinf(2.0f*M_PI * 0), 0.0, 1.0f);
+	
+	for (int i = 0; i < corner; i++) {
+		m_Points[3 * i] = vec4(0, 0, 0, 1.0f);
+		m_Points[3 * i + 1] = vec4(1.2f *RADIUS * cosf(M_PI*2.0f* i / corner), 1.2f * RADIUS * sinf(M_PI*2.0f* i / corner), 0, 1.0f);
+		m_Points[3 * i + 2] = vec4(0.7f*RADIUS * cosf(M_PI*2.0f* (i + 1) / corner), 0.7f * RADIUS * sinf(M_PI*2.0f* (i + 1) / corner), 0, 1.0f);
 
-	m_Colors[0] = vec4(1.7f, 0.2f, 0.4f, 1.0);
-	for (int i = 1; i <= CornerNUM + 1; i++)
-	{
-		m_Colors[i]= vec4(1.0f, 1.0f, 1.0f, 0.5f);
 	}
-	EnemyHealth =70;//Enemy¦å¶q
+
+	
+	for (int i = 0; i < corner; i++)
+	{
+		m_Colors[3 * i]= vec4(1.0f,0.0,0.0,1.0);
+		m_Colors[3 * i + 1]= vec4(0.0f, 0.0, 0.0, 1.0);
+		m_Colors[3 * i + 2] = vec4(1.0f, 0.0, 0.0, 1.0);
+	}
+	Ra = 90.0f;
+	Rsa = 0;
+	BossMode = 1;
+	BossC = false;
 	/*m_Colors[0] = vec4(3.2f, 2.0f, 1.5f, 1.0);
 	for (int i = 1; i <= CornerNUM + 1; i++)
 	{
@@ -24,10 +29,11 @@ enemy3::enemy3()
 	// Create and initialize a buffer object 
 	CreateBufferObject();
 	m_bUpdateProj = false;
+	 BossHealth = 60;//Boss¦å¶q
 }
 
 
-void enemy3::CreateBufferObject()
+void Boss::CreateBufferObject()
 {
     glGenVertexArrays( 1, &m_uiVao );
     glBindVertexArray( m_uiVao );
@@ -41,7 +47,51 @@ void enemy3::CreateBufferObject()
     glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points ); 
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
-void enemy3::animation(float &f1) {
+void Boss::ChangeColor() {
+	for (int i = 0; i < corner; i++)
+	{
+		m_Colors[3 * i] = vec4(0.0f, 0.0, 1.0, 1.0);
+		m_Colors[3 * i + 1] = vec4(1.0f, 1.0, 1.0, 1.0);
+		m_Colors[3 * i + 2] = vec4(0.0f, 0.0, 1.0, 1.0);
+
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
+}
+void Boss::BossK() {
+	corner -= 1.0f;
+	if (corner < 7)corner = 7;
+	for (int i = 0; i < corner; i++) {
+		m_Points[3 * i] = vec4(0, 0, 0, 1.0f);
+		m_Points[3 * i + 1] = vec4(1.2f *RADIUS * cosf(M_PI*2.0f* i / corner), 1.2f * RADIUS * sinf(M_PI*2.0f* i / corner), 0, 1.0f);
+		m_Points[3 * i + 2] = vec4(0.7f*RADIUS * cosf(M_PI*2.0f* (i + 1) / corner), 0.7f * RADIUS * sinf(M_PI*2.0f* (i + 1) / corner), 0, 1.0f);
+
+	}
+	
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points);
+	
+}
+void Boss::Move(float dt) {
+	if (BossHealth < 40 && BossHealth>20)BossMode = 2;
+	if (BossHealth <=20 && BossHealth >=0)BossMode = 3;
+	Rsa += M_PI*100*dt;
+	if (BossMode == 1||BossMode == 2) {
+		Bx = 9.0f* cosf(Ra += M_PI*0.1f*dt);
+		By = 9.0f* sinf(Ra += M_PI*0.1f*dt);
+	}
+	if (BossMode == 3) {
+		Bx = 9.0f* cosf(Ra += M_PI*0.4f*dt);
+		By = 9.0f* sinf(Ra += M_PI*0.4f*dt);
+	}
+	if (Ra > 360)Ra = 0;
+	if (Rsa > 360)Rsa = 0;
+	m_mxTRS = Translate(vec4(Bx,By,0,1.0))*RotateZ(Rsa);
+	m_bUpdateMV = true;
+}
+void Boss::animation(float &f1) {
 	float x;
 	float y;
 	
@@ -52,7 +102,7 @@ void enemy3::animation(float &f1) {
 	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points);
 }
-void enemy3::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
+void Boss::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
 {
     // Load shaders and use the resulting shader program
 	if( uiShaderHandle == MAX_UNSIGNED_INT) m_uiProgram = InitShader("vsVtxColor.glsl", "fsVtxColor.glsl");
@@ -77,25 +127,25 @@ void enemy3::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void enemy3::SetViewMatrix(mat4 &mat)
+void Boss::SetViewMatrix(mat4 &mat)
 {
 	m_mxView = mat;
 	m_bUpdateMV = true;
 }
 
-void enemy3::SetProjectionMatrix(mat4 &mat)
+void Boss::SetProjectionMatrix(mat4 &mat)
 {
 	m_mxProjection = mat;
 	m_bUpdateProj = true;
 }
 
-void enemy3::SetTRSMatrix(mat4 &mat)
+void Boss::SetTRSMatrix(mat4 &mat)
 {
 	m_mxTRS = mat;
 	m_bUpdateMV = true;
 }
 
-void enemy3::SetColor(GLfloat vColor[4])
+void Boss::SetColor(GLfloat vColor[4])
 {
 	for( int i = 0 ; i < 6 ; i++ ) {
 		m_Colors[i].x = vColor[0];
@@ -107,7 +157,7 @@ void enemy3::SetColor(GLfloat vColor[4])
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
 
-void enemy3::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[])
+void Boss::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[])
 {
 	m_Colors[0].x = vLFColor[0];
 	m_Colors[0].y = vLFColor[1];
@@ -135,7 +185,7 @@ void enemy3::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRCol
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
 
-void enemy3::Draw()
+void Boss::Draw()
 {
 	glUseProgram( m_uiProgram );
 	glBindVertexArray( m_uiVao );
@@ -149,10 +199,10 @@ void enemy3::Draw()
 		glUniformMatrix4fv( m_uiProjection, 1, GL_TRUE, m_mxProjection );
 		m_bUpdateProj = false;
 	}
-	glDrawArrays( GL_TRIANGLE_FAN, 0, QUAD_NUM );
+	glDrawArrays( GL_TRIANGLES, 0,  80);
 }
 
-void enemy3::DrawW()
+void Boss::DrawW()
 {
 	glBindVertexArray( m_uiVao );
 
@@ -166,5 +216,5 @@ void enemy3::DrawW()
 		glUniformMatrix4fv( m_uiProjection, 1, GL_TRUE, m_mxProjection );
 		m_bUpdateProj = false;
 	}
-	glDrawArrays( GL_TRIANGLE_FAN, 0, QUAD_NUM );
+	glDrawArrays( GL_TRIANGLES, 0, NUM);
 }

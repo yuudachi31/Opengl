@@ -1,15 +1,15 @@
-#include "Ebullet.h"
+#include "fire.h"
 
-Ebullet::Ebullet()
+fire ::fire()
 {
 	OnUse = false;
 	Exact = false;
-	m_Points[0] = vec4( 0.0,  0.15f, 0.0f, 1.0f);  //1
-	m_Points[1] = vec4(  0.15f,  0.0, 0.0f, 1.0f);
-	m_Points[2] = vec4(  0.0, -0.15f, 0.0f, 1.0f);
-	m_Points[3] = vec4(0.0f, -0.15f, 0.0f, 1.0f);    //2
-	m_Points[4] = vec4(-0.15f, 0.0f, 0.0f, 1.0f);
-	m_Points[5] = vec4(0.0f, 0.15f, 0.0f, 1.0f);
+	m_Points[0] = vec4( -0.2f,  0.2f, 0.0f, 1.0f);  //1
+	m_Points[1] = vec4(  0.2f,  0.2f, 0.0f, 1.0f);
+	m_Points[2] = vec4(  0.2f, -0.2f, 0.0f, 1.0f);
+	m_Points[3] = vec4(0.2f, -0.2f, 0.0f, 1.0f);    //2
+	m_Points[4] = vec4(-0.2f, -0.2f, 0.0f, 1.0f);
+	m_Points[5] = vec4(-0.2f, 0.2f, 0.0f, 1.0f);
 	m_Points[6] = vec4(0.0f, 0.0f, 0.0f, 1.0f);    //3
 	m_Points[7] = vec4(0.2f, 10.0f, 0.0f, 1.0f);
 	//m_Points[8] = vec4(-0.2f, 0.7f, 0.0f, 1.0f);
@@ -27,13 +27,13 @@ Ebullet::Ebullet()
 	//m_Points[20] = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 
-	m_Colors[0] = vec4(0.7f, 0.2f, 0.7f, 1.0f);
-	m_Colors[1] = vec4(0.7f, 0.2f, 0.7f, 1.0f);
-	m_Colors[2] = vec4(0.7f, 0.2f, 0.7f, 1.0f);
-	m_Colors[3] = vec4(0.7f, 0.2f, 0.7f, 1.0f);
-	m_Colors[4] = vec4(0.7f, 0.2f, 0.7f, 1.0f);
-	m_Colors[5] = vec4(0.7f, 0.2f, 0.7f, 1.0f);
-	m_Colors[6] = vec4(0.7f, 0.2f, 0.7f, 1.0f);
+	m_Colors[0] = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_Colors[1] = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_Colors[2] = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_Colors[3] = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_Colors[4] = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_Colors[5] = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_Colors[6] = vec4(0.3f, 0.7f, 0.7f, 1.0f);
 	m_Colors[7] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
 	m_Colors[8] = vec4(0.88f, 0.48f, 0.24f, 1.0f);
 	m_Colors[9] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
@@ -49,64 +49,55 @@ Ebullet::Ebullet()
 	m_Colors[19] = vec4(1.0f, 0.1f, 0.05f, 1.0f);
 	m_Colors[20] = vec4(1.0f, 0.8f, 0.2f, 1.0f);  // (r, g, b, a)
 	Link = NULL;
-	E3Use = false;
+	R_angle = 1.0f;
+	animateT = 0;
+	Sx = 0.0f;
+	Sy = 0.0f;
+	Sz = 0.0f;
 	// Create and initialize a buffer object 
 	CreateBufferObject();
 	m_bUpdateProj = false;
 }
-void Ebullet::Shoot(float bx, float by,float px,float py) {
-	
+void fire::Shoot(float bx, float by) {
 	BLoc[0] = bx; BLoc[1] = by;
-	ax = (px - BLoc[0]) / sqrt(pow((px - BLoc[0]), 2) + pow((py - BLoc[1]), 2));
-	ay = (py - BLoc[1]) / sqrt(pow((px - BLoc[0]), 2) + pow((py - BLoc[1]), 2));
 //	printf("got");
 }
 
-void Ebullet::Move(float dt) {
-	if (E3Use == true) {
-		if (BLoc[1] > -13) {
-			BLoc[1] -= 18 * dt;
-			Loc = vec4(BLoc[0], BLoc[1], 0, 0);
-			Bfly = Translate(Loc);
-			m_mxTRS = Bfly;
-		}
-	}
-	if (E3Use == false) {
+void fire::Move(float dt) {
+	animateT += dt;
+	R_angle += dt * 360*2;
+	if (R_angle > 360)R_angle = 0;
+	if (animateT < 0.3f) {
+		Sx += 2*dt;
+		Sy += 2*dt;
+		Loc = vec4(BLoc[0], BLoc[1], 0, 0);
+		Bfly = Translate(Loc);
+		m_mxTRS = Bfly*RotateZ(R_angle)*Scale(Sx, Sy, Sz);;
 
 	}
+	if (animateT >0.3f ) {
+		Loc = vec4(BLoc[0], BLoc[1], 0, 0);
+		Bfly = Translate(Loc);
+		if (Sx > 0 || Sy > 0) {
+			Sx -= dt;
+			Sy -= dt;
+		}
+		//FScale = vec4(1.0f-=dt,1.0f-=dt,0,1.0);
+		m_mxTRS = Bfly*RotateZ(R_angle)*Scale(Sx,Sy,Sz);
+	}
+	if (animateT > 1.0f) {
+		Sx = 0.0f;
+		Sy = 0.0f;
+		Sz = 0.0f;
+		Exact = false;
+		animateT = 0;
+	}
+		m_bUpdateMV = true; 
 	
-	if (BLoc[1] < -13) {
-		Exact = false;
-		BLoc[1] = -40;
 	}
-	m_bUpdateMV = true;
-}
-void Ebullet::Move(float dt, float px, float py) {
-	if (E3Use == true) {
-		if (BLoc[0] < 13 && BLoc[0]>-13 && BLoc[1]<13 && BLoc[1] > -13) {
-			/*ax = (px - BLoc[0]) / sqrt(pow((px - BLoc[0]), 2) + pow((py - BLoc[1]), 2));
-			ay = (py - BLoc[1]) / sqrt(pow((px - BLoc[0]), 2) + pow((py - BLoc[1]), 2));*/
-			BLoc[0] += ax*dt * 18; BLoc[1] += ay*dt * 18;
-			Loc = vec4(BLoc[0], BLoc[1], 0, 0);
-			Bfly = Translate(Loc);
-			m_mxTRS = Bfly;
-		}
-	}
-	if (E3Use == false) {
-		if (BLoc[1] > -13) {
-			BLoc[1] -= 18 * dt;
-			Loc = vec4(BLoc[0], BLoc[1], 0, 0);
-			Bfly = Translate(Loc);
-			m_mxTRS = Bfly;
-		}
-	}
-	if (BLoc[0] > 13 || BLoc[0] < -13 || BLoc[1] > 13 || BLoc[1] < -13) {
-		Exact = false;
-		BLoc[1] = -40;
-	}
-	m_bUpdateMV = true;
-}
-void Ebullet::animation(float &f1) {
+	
+
+void fire::animation(float &f1) {
 
 	m_Points[1] = vec4(0.8f + 0.2f*f1, 1.2f + 0.2*f1, 0.0f, 1.0f);
 	m_Points[2] = vec4(0.8f + 0.2*f1, -1.2f + 0.2f*f1, 0.0f, 1.0f);
@@ -117,7 +108,7 @@ void Ebullet::animation(float &f1) {
 	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points);
 }
-void Ebullet::CreateBufferObject()
+void fire::CreateBufferObject()
 {
     glGenVertexArrays( 1, &m_uiVao );
     glBindVertexArray( m_uiVao );
@@ -132,7 +123,7 @@ void Ebullet::CreateBufferObject()
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
 
-void Ebullet::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
+void fire::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
 {
     // Load shaders and use the resulting shader program
 	if( uiShaderHandle == MAX_UNSIGNED_INT) m_uiProgram = InitShader("vsVtxColor.glsl", "fsVtxColor.glsl");
@@ -157,25 +148,25 @@ void Ebullet::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void Ebullet::SetViewMatrix(mat4 &mat)
+void fire::SetViewMatrix(mat4 &mat)
 {
 	m_mxView = mat;
 	m_bUpdateMV = true;
 }
 
-void Ebullet::SetProjectionMatrix(mat4 &mat)
+void fire::SetProjectionMatrix(mat4 &mat)
 {
 	m_mxProjection = mat;
 	m_bUpdateProj = true;
 }
 
-void Ebullet::SetTRSMatrix(mat4 &mat)
+void fire::SetTRSMatrix(mat4 &mat)
 {
 	m_mxTRS = mat;
 	m_bUpdateMV = true;
 }
 
-void Ebullet::SetColor(GLfloat vColor[4])
+void fire::SetColor(GLfloat vColor[4])
 {
 	for( int i = 0 ; i < 6 ; i++ ) {
 		m_Colors[i].x = vColor[0];
@@ -187,7 +178,7 @@ void Ebullet::SetColor(GLfloat vColor[4])
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
 
-void Ebullet::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[])
+void fire::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[])
 {
 	m_Colors[0].x = vLFColor[0];
 	m_Colors[0].y = vLFColor[1];
@@ -215,7 +206,7 @@ void Ebullet::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRCo
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
 
-void Ebullet::Draw()
+void fire::Draw()
 {
 	glUseProgram( m_uiProgram );
 	glBindVertexArray( m_uiVao );
@@ -232,7 +223,7 @@ void Ebullet::Draw()
 	glDrawArrays( GL_TRIANGLES, 0, QUAD_NUM );
 }
 
-void Ebullet::DrawW()
+void fire::DrawW()
 {
 	glBindVertexArray( m_uiVao );
 

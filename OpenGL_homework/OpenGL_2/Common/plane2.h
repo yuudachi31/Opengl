@@ -34,6 +34,7 @@ public:
 	void MODE1();
 	void MODE2();
 	void MODE3();
+	bool md1, md2, md3;
 	void SetShader(mat4 &mxModelView, mat4 &mxProjection, GLuint uiShaderHandle=MAX_UNSIGNED_INT);
 	GLuint GetShaderHandle() { return m_uiProgram;}
 	void SetViewMatrix(mat4 &mat);
@@ -41,7 +42,8 @@ public:
 	void SetTRSMatrix(mat4 &mat);
 	void SetColor(GLfloat vColor[4]); // Single color
 	void SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[]); // four Vertices' Color
-
+	int PlaneHealth;
+	void DeadC();
 	void Draw();
 	void DrawW();
 };

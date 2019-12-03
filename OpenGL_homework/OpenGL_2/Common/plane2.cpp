@@ -47,7 +47,11 @@ plane2::plane2()
 	m_Colors[19] = vec4(1.0f, 0.1f, 0.05f, 1.0f);
 	m_Colors[20] = vec4(1.0f, 0.8f, 0.2f, 1.0f);  // (r, g, b, a)
 	
-	
+	md1 = true;
+	md2 = false;
+	md3 = false;
+
+	 PlaneHealth = 10;
 	// Create and initialize a buffer object 
 	CreateBufferObject();
 	m_bUpdateProj = false;
@@ -111,9 +115,18 @@ void plane2::SetTRSMatrix(mat4 &mat)
 	m_mxTRS = mat;
 	m_bUpdateMV = true;
 }
-
+void plane2::DeadC() {
+	for (int i = 0; i < 21; i++) {
+		m_Colors[i] = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	}
+	printf("YYYYYYYYYYYYY");
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
+}
 void plane2::MODE1() {
-
+	md1 = true;
+	md2 = false;
+	md3 = false;
 	m_Points[0] = vec4(0.0f, 0.0f, 0.0f, 1.0f);  //1
 	m_Points[1] = vec4(0.35f, 0.39f, 0.0f, 1.0f);
 	m_Points[2] = vec4(0.2f, 0.7f, 0.0f, 1.0f);
@@ -167,6 +180,9 @@ void plane2::MODE1() {
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
 }
 void plane2::MODE2() {
+	md1 = false;
+	md2 = true;
+	
 	m_Points[0] = vec4(0.0f, 0.0f, 0.0f, 1.0f);  //1
 	m_Points[1] = vec4(0.35f, 0.39f, 0.0f, 1.0f);
 	m_Points[2] = vec4(0.2f, 1.0f, 0.0f, 1.0f);
@@ -195,6 +211,8 @@ void plane2::MODE2() {
 }
 
 void plane2::MODE3() {
+	md1 = false;
+	md3 = true;
 	m_Colors[0] = vec4(0.1f, 0.35f, 0.5f, 0.5f); ;
 	m_Colors[1] = vec4(0.1f, 0.4f, 0.7f, 0.5f);
 	m_Colors[2] = vec4(0.1f, 0.2f, 1.0f, 0.5f);

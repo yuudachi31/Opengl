@@ -78,6 +78,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Common\Boss.cpp" />
+    <ClCompile Include="Common\BossEye.cpp" />
     <ClCompile Include="Common\bullet.cpp" />
     <ClCompile Include="Common\common.cpp" />
     <ClCompile Include="Common\CQuad.cpp" />
@@ -86,6 +88,8 @@
     <ClCompile Include="Common\enemy.cpp" />
     <ClCompile Include="Common\enemy2.cpp" />
     <ClCompile Include="Common\enemy3.cpp" />
+    <ClCompile Include="Common\fire.cpp" />
+    <ClCompile Include="Common\GuidedMissile.cpp" />
     <ClCompile Include="Common\plane2.cpp" />
     <ClCompile Include="Common\Propeller.cpp" />
     <ClCompile Include="Common\CQuadEX2B.cpp" />
@@ -94,6 +98,8 @@
     <ClCompile Include="InitShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\Boss.h" />
+    <ClInclude Include="Common\BossEye.h" />
     <ClInclude Include="Common\bullet.h" />
     <ClInclude Include="Common\CQuad.h" />
     <ClInclude Include="Common\Background1.h" />
@@ -101,6 +107,8 @@
     <ClInclude Include="Common\enemy.h" />
     <ClInclude Include="Common\enemy2.h" />
     <ClInclude Include="Common\enemy3.h" />
+    <ClInclude Include="Common\fire.h" />
+    <ClInclude Include="Common\GuidedMissile.h" />
     <ClInclude Include="Common\plane2.h" />
     <ClInclude Include="Common\Propeller.h" />
     <ClInclude Include="Common\CQuadEX2B.h" />

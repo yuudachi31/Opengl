@@ -63,6 +63,18 @@
     <ClCompile Include="Common\Ebullet.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="Common\fire.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Boss.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\BossEye.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\GuidedMissile.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header\Angel.h">
@@ -108,6 +120,18 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Common\Ebullet.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\fire.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Boss.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BossEye.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\GuidedMissile.h">
       <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>

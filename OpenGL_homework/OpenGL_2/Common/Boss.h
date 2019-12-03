@@ -1,16 +1,16 @@
-#ifndef enemy3_H
-#define enemy3_H
+#ifndef Boss_H
+#define Boss_H
 #include "../header/Angel.h"
 
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
-#define CornerNUM 6
-#define QUAD_NUM  CornerNUM + 2 // 2 faces, 2 triangles/face 
+#define RADIUS 3
+ // 2 faces, 2 triangles/face 
 #define Radius 0.7
-class enemy3
+class Boss
 {
 private:
-	
+
 	// VAO
 	GLuint m_uiVao;
 	// VBO
@@ -29,22 +29,29 @@ private:
 	
 	void CreateBufferObject();
 public:
-	int NUM;
-	vec4 m_Points[QUAD_NUM];
-	vec4 m_Colors[QUAD_NUM];
-	enemy3();
-	int EnemyHealth;//Enemy¦å¶q
+	int corner = 15;
+	int NUM = corner * 3;
+	vec4 m_Points[45];
+	vec4 m_Colors[45];
+	Boss();
+	bool BossC;
+	int BossHealth;//Boss¦å¶q
 	void SetShader(mat4 &mxModelView, mat4 &mxProjection, GLuint uiShaderHandle=MAX_UNSIGNED_INT);
 	GLuint GetShaderHandle() { return m_uiProgram;}
 	void SetViewMatrix(mat4 &mat);
 	void SetProjectionMatrix(mat4 &mat);
-	void animation(float &f1);
+	void  animation(float &f1);
 	void SetTRSMatrix(mat4 &mat);
 	void SetColor(GLfloat vColor[4]); // Single color
 	void SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[]); // four Vertices' Color
-
+	void ChangeColor();
+	float Bx, By;
+	float Ra,Rsa;
+	void BossK();
+	void Move(float dt);
 	void Draw();
 	void DrawW();
+	int BossMode;
 };
 
 
