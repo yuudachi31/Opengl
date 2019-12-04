@@ -17,6 +17,7 @@
 #include "Common/Boss.h"
 #include "Common/BossEye.h"
 #include "Common/GuidedMissile.h"
+#include "Common/Block.h"
 #define SPACE_KEY 32
 #define SCREEN_SIZE 800
 #define HALF_SIZE (SCREEN_SIZE/2) 
@@ -32,7 +33,8 @@ enemy2 *Enemy2;
 enemy3 *Enemy3[2];
 Boss *boss1;
 BossEye *eye;
-bullet *phead,*pget,*ptail,*puse;
+Block *blk[2];
+bullet *phead, *pget, *ptail, *puse;
 Ebullet *Ehead, *Eget, *Etail;
 GuidedMissile *Mhead, *Mget, *Mtail;
 fire *Fhead, *Fget, *Ftail;
@@ -72,6 +74,7 @@ float BossLoc[2];
 float TIME=0;//總時間
 float cooldown = 1;  //子彈冷卻
 float Mcooldown = 1;//飛彈冷卻
+float Hcooldown = 0.5; //碰撞顏色回復
 float Enemy1coldT = 0; //Enemy冷卻
 float Enemy3coldT = 0; //Enemy3冷卻
 float BossCold = 0;
@@ -156,6 +159,14 @@ void Enemy2Moving(float dt) {
 	Enemy2->SetTRSMatrix(mEnemy2Move);
 }
 void ColdT(float dt) {
+	if (Plane->PlaneHealth > 0) {
+		if (Hcooldown <= 0.6) {
+			Hcooldown += 4 * dt;
+			if (Hcooldown > 0.5&&Hcooldown < 0.6) {
+				Plane->hitB();
+			}
+		}
+	}
 	Mcooldown +=  4*dt;
 	if (Mcooldown > 5) {
 		Mcooldown = 5;
@@ -227,22 +238,36 @@ void bulletMOVE(float dt) {
 	}
 }
 void PropellerRotate(float dt){
-	
+	vec4 blkT[2];
 	vec4 vT[2];
 	g_TotTime += dt;
 	if (g_TotTime >= 2.0*M_PI)g_TotTime = 0;
-	g_fAngle = g_TotTime*800.0f;
+	
 	vT[0] = vec4(-0.9f, 0, 0, 0);
 	vT[1] = vec4(0.9f, 0, 0, 0);
-	mxRot = RotateZ(g_fAngle);
+	
+	blkT[0] = vec4(-1.5f, 0, 0, 0);
+	blkT[1] = vec4(1.5f, 0, 0, 0);
+
 
 	for (int i = 0; i < 2; i++) {
+		mxT = Translate(blkT[i]);
+		g_fAngle = g_TotTime*600.0f;
+		mxRot = RotateZ(g_fAngle);
+		blk[i]->SetTRSMatrix(mxGT*mxRot*mxT);
+	}
+	for (int i = 0; i < 2; i++) {
+		g_fAngle = g_TotTime*800.0f;
+		mxRot = RotateZ(g_fAngle);
 		mxT = Translate(vT[i]);
 		g_pQuad[i]->SetTRSMatrix(mxGT*mxT*mxRot);
 	}
 	if (Plane->PlaneHealth == 0) {
 		Plane->DeadC();
 		Plane->PlaneHealth = -1;
+	}
+	if (Plane->PlaneHealth < -1) {
+		Plane->PlaneHealth = -2;
 	}
 	//g_fAngle += g_fDir * 1.0f;     // 旋轉角度遞增(遞減) 0.125 度
 	//if( g_fAngle > 360.0 ) g_fAngle -= 360;
@@ -254,11 +279,12 @@ void PropellerRotate(float dt){
 void bossCtrl(float dt) {
 	TIME += dt;
 	if (TIME > 23 && TIME < 25) {
+		BossOk = true;
 		BossLoc[1] -= 3*dt;
 		boss1->SetTRSMatrix(Translate(vec4(BossLoc[0], BossLoc[1], 0, 1.0))*Em3R);
 		eye->SetTRSMatrix(Translate(vec4(BossLoc[0], BossLoc[1], 0, 1.0)));
 	}
-	if (TIME >= 25) {
+	if (TIME > 25) {
 		BossOk = true;
 		boss1->Move(dt);
 		eye->Move(dt,boss1->BossMode);
@@ -346,6 +372,10 @@ void CreatePlayer()
 	Plane = new plane2;
 	Plane->SetShader(g_mxModelView, g_mxProjection);
 	uiShaderHandle = Plane->GetShaderHandle();
+	blk[0] = new Block;
+	blk[0]->SetShader(g_mxModelView, g_mxProjection);
+	blk[1] = new Block;
+	blk[1]->SetShader(g_mxModelView, g_mxProjection);
 	for (int i = 0; i < 2; i++) {
 		
 			
@@ -362,8 +392,7 @@ void CreatePlayer()
 				g_fQuadT[idx][0] = -20;
 				
 			}
-			mxT = Translate(g_fQuadT[idx][0], g_fQuadT[idx][1], g_fQuadT[idx][2]);
-			g_pQuad[idx]->SetTRSMatrix(mxT);
+			
 			idx++;
 		}
 	}
@@ -511,10 +540,30 @@ void BossShoot() {
 }
 float crashCD = 0;
 void HitOrNot(float dt) {
-	crashCD += dt; if (crashCD > 3)crashCD = 3.0f;
+		crashCD += dt; if (crashCD > 3)crashCD = 3.0f;
+	if (Enemy2Loc[0] - 1.2f < g_fTx + 1.0f && Enemy2Loc[0] + 1.2f  > g_fTx - 1.0f  && Enemy2Loc[1] + 0.8f > g_fTy - 0.2f && Enemy2Loc[1]  - 0.8f < g_fTy + 0.6f) {
+
+		if (crashCD > 1.5) {
+			printf("Fly"); crashCD = 0;
+			if (Plane->PlaneHealth > 0 && Plane->PlaneHealth <= 10) {
+				Hcooldown = 0;
+				Plane->hit();
+				
+			}
+			Plane->PlaneHealth -= 2;
+		}
+	}
+	
 	if (boss1->Bx - 2.0f < g_fTx + 1.0f && boss1->Bx + 2.0f  > g_fTx - 1.0f  && boss1->By + 2.0f > g_fTy - 0.2f && boss1->By - 2.0f < g_fTy + 0.6f) {
+		
 		if (crashCD > 1.5) { 
 			printf("OMG"); crashCD = 0;
+			if (Plane->PlaneHealth > 0 && Plane->PlaneHealth <= 10) {
+				Hcooldown = 0;
+				Plane->hit();
+				
+			}
+			Plane->PlaneHealth -= 3;
 		}
 	}
 	pget = phead;
@@ -542,11 +591,7 @@ void HitOrNot(float dt) {
 				pget->Exact = false; printf("yolo""\n");
 				boss1->BossHealth -= 1;
 				if (boss1->BossHealth < 16) { boss1->BossK(); }
-				if (boss1->BossHealth < 0) { BossL = false; printf("bossdead""\n");
-				delete boss1;
-				delete eye;
-				glClearColor(1.0f, 0.8, 0.3, 1.0);
-				}
+				
 			}
 
 		}
@@ -558,6 +603,10 @@ void HitOrNot(float dt) {
 				if (Eget->Loc.x < g_fTx + 1.0f && Eget->Loc.x  > g_fTx-1.0f  && Eget->Loc.y > g_fTy - 0.2f && Eget->Loc.y < g_fTy + 0.6f)
 				{
 					Fire(Eget->Loc.x, Eget->Loc.y);
+					if (Plane->PlaneHealth > 0&& Plane->PlaneHealth <= 10) {
+						Hcooldown = 0;
+						Plane->hit();
+					}
 					Eget->Exact = false; printf("owo""\n");
 					Plane->PlaneHealth -= 1;
 				}
@@ -565,6 +614,7 @@ void HitOrNot(float dt) {
 		}
 		Eget = Eget->Link;
 	}
+
 	Mget = Mhead;
 	while (Mget != NULL) {
 		if (Mget->Exact == true) {
@@ -572,11 +622,20 @@ void HitOrNot(float dt) {
 			{
 				Fire(Mget->Loc.x, Mget->Loc.y);
 				Mget->Exact = false; printf("bang""\n");
+				if (boss1->BossHealth < 16) { boss1->BossK(); boss1->BossK();
+				}
 				boss1->BossHealth -= 2;
+
 			}
 
 		}
 		Mget = Mget->Link;
+	}
+	if (boss1->BossHealth < 0&& BossL == true) {
+		BossL = false; printf("bossdead""\n");
+		delete boss1;
+		delete eye;
+		glClearColor(1.0f, 0.8, 0.3, 1.0);
 	}
 
 }
@@ -593,7 +652,15 @@ void GL_Display( void )
 	Plane->DrawW();
 	g_pQuad[0]->DrawW();
 	g_pQuad[1]->DrawW();
-	if (TIME > 20 && BossOk == true) {
+	if (Plane->PlaneHealth > 15) {
+		blk[0]->DrawW();
+		blk[1]->DrawW();
+	}
+	if (Plane->PlaneHealth > 10 && Plane->PlaneHealth <= 15) {
+		
+		blk[1]->DrawW();
+	}
+	if (TIME > 20 && BossOk == true&&  BossL == true) {
 		boss1->DrawW();
 		eye->DrawW();
 	}
@@ -695,6 +762,10 @@ void Win_Keyboard( unsigned char key, int x, int y )
 				printf("jj");
 			}
 		}
+		break;
+	case 69: // E key
+	case 101: // e key
+		Plane->PlaneHealth += 10;
 		break;
 	case 82: // R key
 	case 114: // r key

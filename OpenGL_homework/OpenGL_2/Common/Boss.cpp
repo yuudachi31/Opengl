@@ -61,7 +61,7 @@ void Boss::ChangeColor() {
 }
 void Boss::BossK() {
 	corner -= 1.0f;
-	if (corner < 7)corner = 7;
+	if (corner < 3)corner = 3;
 	for (int i = 0; i < corner; i++) {
 		m_Points[3 * i] = vec4(0, 0, 0, 1.0f);
 		m_Points[3 * i + 1] = vec4(1.2f *RADIUS * cosf(M_PI*2.0f* i / corner), 1.2f * RADIUS * sinf(M_PI*2.0f* i / corner), 0, 1.0f);

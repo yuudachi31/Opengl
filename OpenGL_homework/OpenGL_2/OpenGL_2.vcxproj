@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Common\Block.cpp" />
     <ClCompile Include="Common\Boss.cpp" />
     <ClCompile Include="Common\BossEye.cpp" />
     <ClCompile Include="Common\bullet.cpp" />
@@ -98,6 +99,7 @@
     <ClCompile Include="InitShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\Block.h" />
     <ClInclude Include="Common\Boss.h" />
     <ClInclude Include="Common\BossEye.h" />
     <ClInclude Include="Common\bullet.h" />

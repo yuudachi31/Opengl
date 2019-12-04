@@ -1,34 +1,44 @@
-#include "enemy.h"
+#include "Block.h"
 
-enemy::enemy()
+Block::Block()
 {
-	NUM = CornerNUM;
-		m_Points[0] = vec4(0.0, 1.0, 0.0,1.0f);
-		for (int i = 0; i <= CornerNUM-1 ; i++) {
-			m_Points[i+1] = vec4(Radius * cosf(2.0f*M_PI * i / CornerNUM), Radius*sinf(2.0f*M_PI * i / CornerNUM), 0.0, 1.0f);
-			
-		}
-		m_Points[CornerNUM+1] = vec4(Radius*cosf(2.0f*M_PI * 0), Radius*sinf(2.0f*M_PI * 0), 0.0, 1.0f);
+	m_Points[0] = vec4(0.05f, 0.4f, 0.3f, 1.0f);  //
+	m_Points[1] = vec4(-0.05f, 0.4f, 1.0f, 1.0f);
+	m_Points[2] = vec4(-0.05f, -0.4f, 0.7f, 1.0f);
+	m_Points[3] = vec4(0.05f, -0.4f, 1.0f, 1.0f);
+	m_Points[4] = vec4(-0.05f, -0.4f, 0.3f, 1.0f);
+	m_Points[5] = vec4(0.05f, 0.4f, 0.7f, 1.0f);
 
-	m_Colors[0] = vec4(1.7f, 0.2f, 0.4f, 1.0);
-	for (int i = 1; i <= CornerNUM + 1; i++)
-	{
-		m_Colors[i]= vec4(i*0.1f+0.1f, 1.0f/i, 1.0f, 0.5f);
-	}
+
+	m_Colors[0] = vec4(0.7f, 0.9f, 0.3f, 1.0f);  // (r, g, b, a)
+	m_Colors[1] = vec4(0.7f, 0.9f, 0.3f, 1.0f);
+	m_Colors[2] = vec4(0.7f, 0.9f, 0.3f, 1.0f);
+	m_Colors[3] = vec4(0.7f, 0.9f, 0.3f, 1.0f);
+	m_Colors[4] = vec4(0.7f, 0.9f, 0.3f, 1.0f);
+	m_Colors[5] = vec4(0.7f, 0.9f, 0.3f, 1.0f);
 	
-	/*m_Colors[0] = vec4(3.2f, 2.0f, 1.5f, 1.0);
-	for (int i = 1; i <= CornerNUM + 1; i++)
-	{
-		m_Colors[i] = vec4(i*0.1f + 0.1f, 1.0f / i, 1.0f, 0.5f);
-	}*/
+
+	//m_Points[0] = vec4( -0.5f,  0.5f, 0.0f, 1.0f);
+	//m_Points[1] = vec4(  0.5f,  0.5f, 0.0f, 1.0f);
+	//m_Points[2] = vec4(  0.5f, -0.5f, 0.0f, 1.0f);
+	//m_Points[3] = vec4( -0.5f,  0.5f, 0.0f, 1.0f);
+	//m_Points[4] = vec4(  0.5f, -0.5f, 0.0f, 1.0f);
+	//m_Points[5] = vec4( -0.5f, -0.5f, 0.0f, 1.0f);
+
+	//m_Colors[0] = vec4( 1.0f, 1.0f,  1.0f, 1.0f);  // (r, g, b, a)
+	//m_Colors[1] = vec4( 1.0f, 1.0f,  1.0f, 1.0f);
+	//m_Colors[2] = vec4( 1.0f, 1.0f,  1.0f, 1.0f);
+	//m_Colors[3] = vec4( 1.0f, 1.0f,  1.0f, 1.0f);
+	//m_Colors[4] = vec4( 1.0f, 1.0f,  1.0f, 1.0f);
+	//m_Colors[5] = vec4( 1.0f, 1.0f,  1.0f, 1.0f);
+
 	// Create and initialize a buffer object 
 	CreateBufferObject();
 	m_bUpdateProj = false;
-	 EnemyHealth = 6;//Enemy¦å¶q
 }
 
 
-void enemy::CreateBufferObject()
+void Block::CreateBufferObject()
 {
     glGenVertexArrays( 1, &m_uiVao );
     glBindVertexArray( m_uiVao );
@@ -42,61 +52,56 @@ void enemy::CreateBufferObject()
     glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points ); 
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
-void enemy::animation(float &f1) {
-	float x;
-	float y;
-	
-	
-		m_Points[0].x =0.5f* cosf(f1);
-		m_Points[0].y =0.2f* sinf(f1);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points);
-}
-void enemy::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
+
+void Block::SetShader(mat4 &mxView, mat4 &mxProjection, GLuint uiShaderHandle)
 {
     // Load shaders and use the resulting shader program
 	if( uiShaderHandle == MAX_UNSIGNED_INT) m_uiProgram = InitShader("vsVtxColor.glsl", "fsVtxColor.glsl");
 	else m_uiProgram = uiShaderHandle;
 
     // set up vertex arrays
-    GLuint vPosition = glGetAttribLocation( m_uiProgram, "vPosition" );
-    glEnableVertexAttribArray( vPosition );
-    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+	GLuint vPosition = glGetAttribLocation(m_uiProgram, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
-    GLuint vColor = glGetAttribLocation( m_uiProgram, "vColor" ); 
-    glEnableVertexAttribArray( vColor );
-    glVertexAttribPointer( vColor, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(m_Points)) );
+	GLuint vColor = glGetAttribLocation(m_uiProgram, "vColor");
+	glEnableVertexAttribArray(vColor);
+	glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(m_Points)));
 
-	m_uiModelView = glGetUniformLocation( m_uiProgram, "ModelView" );
+	m_uiModelView = glGetUniformLocation(m_uiProgram, "ModelView");
 	m_mxView = mxView;
-	glUniformMatrix4fv( m_uiModelView, 1, GL_TRUE, m_mxView );
+	glUniformMatrix4fv(m_uiModelView, 1, GL_TRUE, m_mxView);
 
-    m_uiProjection = glGetUniformLocation( m_uiProgram, "Projection" );
+	m_uiProjection = glGetUniformLocation(m_uiProgram, "Projection");
 	m_mxProjection = mxProjection;
-	glUniformMatrix4fv( m_uiProjection, 1, GL_TRUE, m_mxProjection );
-	glBindBuffer( GL_ARRAY_BUFFER, 0 );
+	glUniformMatrix4fv(m_uiProjection, 1, GL_TRUE, m_mxProjection);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void enemy::SetViewMatrix(mat4 &mat)
+void Block::SetViewMatrix(mat4 &mat)
 {
 	m_mxView = mat;
 	m_bUpdateMV = true;
 }
 
-void enemy::SetProjectionMatrix(mat4 &mat)
+void Block::SetProjectionMatrix(mat4 &mat)
 {
 	m_mxProjection = mat;
 	m_bUpdateProj = true;
 }
-
-void enemy::SetTRSMatrix(mat4 &mat)
+void Block::SetAngleAndAxis(float fAngle, int iAxis)
 {
-	m_mxTRS = mat;
+	glUniform1f(m_uiAngleLoc, fAngle);
+	glUniform1i(m_uiAxisLoc, iAxis);
+}
+
+void Block::SetTRSMatrix(mat4 &mat)
+{
+	m_mxTRS = mat*propScale;
 	m_bUpdateMV = true;
 }
 
-void enemy::SetColor(GLfloat vColor[4])
+void Block::SetColor(GLfloat vColor[4])
 {
 	for( int i = 0 ; i < 6 ; i++ ) {
 		m_Colors[i].x = vColor[0];
@@ -108,7 +113,7 @@ void enemy::SetColor(GLfloat vColor[4])
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
 
-void enemy::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[])
+void Block::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColor[], GLfloat vTLColor[])
 {
 	m_Colors[0].x = vLFColor[0];
 	m_Colors[0].y = vLFColor[1];
@@ -136,7 +141,7 @@ void enemy::SetVtxColors(GLfloat vLFColor[], GLfloat vLRColor[], GLfloat vTRColo
 	glBufferSubData( GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors );
 }
 
-void enemy::Draw()
+void Block::Draw()
 {
 	glUseProgram( m_uiProgram );
 	glBindVertexArray( m_uiVao );
@@ -150,10 +155,10 @@ void enemy::Draw()
 		glUniformMatrix4fv( m_uiProjection, 1, GL_TRUE, m_mxProjection );
 		m_bUpdateProj = false;
 	}
-	glDrawArrays( GL_TRIANGLE_FAN, 0, QUAD_NUM );
+	glDrawArrays( GL_TRIANGLES, 0, BlockN);
 }
 
-void enemy::DrawW()
+void Block::DrawW()
 {
 	glBindVertexArray( m_uiVao );
 
@@ -167,5 +172,5 @@ void enemy::DrawW()
 		glUniformMatrix4fv( m_uiProjection, 1, GL_TRUE, m_mxProjection );
 		m_bUpdateProj = false;
 	}
-	glDrawArrays( GL_TRIANGLE_FAN, 0, QUAD_NUM );
+	glDrawArrays( GL_TRIANGLES, 0, BlockN);
 }

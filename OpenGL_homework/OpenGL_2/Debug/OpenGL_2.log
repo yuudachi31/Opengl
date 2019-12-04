@@ -1,33 +1,5 @@
-﻿  Example1.cpp
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\propeller.h(13): warning C4305: '引數': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\plane2.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\cquad.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\background1.h(12): warning C4305: '引數': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\plane2.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy2.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy2.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\bullet.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\enemy3.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\ebullet.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\bullet.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\fire.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\ebullet.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\guidedmissile.h(7): warning C4005: 'RADIUS': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\boss.h(7): note: 請參閱 'RADIUS' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\guidedmissile.h(8): warning C4005: 'QUAD_NUM': 巨集重複定義
-  c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\fire.h(8): note: 請參閱 'QUAD_NUM' 之前的定義
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(168): warning C4244: '=': 將 'double' 轉換為 'float'，由於類型不同，可能導致資料遺失
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(264): warning C4244: '引數': 將 'int' 轉換為 'float'，由於類型不同，可能導致資料遺失
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(281): warning C4305: '引數': 從 'double' 轉換為 'GLclampf'，是由較大的類型轉換為較小的類型，可能導致資料遺失
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(299): warning C4101: 'uiShaderHandle': 未參考的區域變數
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(324): warning C4101: 'uiShaderHandle': 未參考的區域變數
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(371): warning C4101: 'uiShaderHandle': 未參考的區域變數
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(432): warning C4101: 'uiShaderHandle': 未參考的區域變數
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(548): warning C4305: '引數': 從 'double' 轉換為 'GLclampf'，是由較大的類型轉換為較小的類型，可能導致資料遺失
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(704): warning C4156: 刪除陣列運算式沒有使用陣列形式的 'delete'; 改用陣列形式
-c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\example1.cpp(704): warning C4154: 不能在陣列運算式上使用 delete; 所以將陣列轉換成指標
+﻿  Ebullet.cpp
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\ebullet.cpp(111): warning C4244: '引數': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\計算機圖學\opengl_homework\opengl_2\common\ebullet.cpp(112): warning C4244: '引數': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
   OpenGL_2.vcxproj -> C:\Users\USER\Desktop\計算機圖學\OpenGL_homework\Debug\OpenGL_2.exe
   OpenGL_2.vcxproj -> C:\Users\USER\Desktop\計算機圖學\OpenGL_homework\Debug\OpenGL_2.pdb (Full PDB)

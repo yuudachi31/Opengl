@@ -65,7 +65,7 @@ void Ebullet::Shoot(float bx, float by,float px,float py) {
 void Ebullet::Move(float dt) {
 	if (E3Use == true) {
 		if (BLoc[1] > -13) {
-			BLoc[1] -= 18 * dt;
+			BLoc[1] -= 14 * dt;
 			Loc = vec4(BLoc[0], BLoc[1], 0, 0);
 			Bfly = Translate(Loc);
 			m_mxTRS = Bfly;
@@ -86,7 +86,7 @@ void Ebullet::Move(float dt, float px, float py) {
 		if (BLoc[0] < 13 && BLoc[0]>-13 && BLoc[1]<13 && BLoc[1] > -13) {
 			/*ax = (px - BLoc[0]) / sqrt(pow((px - BLoc[0]), 2) + pow((py - BLoc[1]), 2));
 			ay = (py - BLoc[1]) / sqrt(pow((px - BLoc[0]), 2) + pow((py - BLoc[1]), 2));*/
-			BLoc[0] += ax*dt * 18; BLoc[1] += ay*dt * 18;
+			BLoc[0] += ax*dt * 14; BLoc[1] += ay*dt * 14;
 			Loc = vec4(BLoc[0], BLoc[1], 0, 0);
 			Bfly = Translate(Loc);
 			m_mxTRS = Bfly;
@@ -94,7 +94,7 @@ void Ebullet::Move(float dt, float px, float py) {
 	}
 	if (E3Use == false) {
 		if (BLoc[1] > -13) {
-			BLoc[1] -= 18 * dt;
+			BLoc[1] -= 14 * dt;
 			Loc = vec4(BLoc[0], BLoc[1], 0, 0);
 			Bfly = Translate(Loc);
 			m_mxTRS = Bfly;

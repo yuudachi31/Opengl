@@ -51,7 +51,7 @@ plane2::plane2()
 	md2 = false;
 	md3 = false;
 
-	 PlaneHealth = 10;
+	 PlaneHealth = 20;
 	// Create and initialize a buffer object 
 	CreateBufferObject();
 	m_bUpdateProj = false;
@@ -180,7 +180,7 @@ void plane2::MODE1() {
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
 }
 void plane2::MODE2() {
-	md1 = false;
+	
 	md2 = true;
 	
 	m_Points[0] = vec4(0.0f, 0.0f, 0.0f, 1.0f);  //1
@@ -237,7 +237,45 @@ void plane2::MODE3() {
 	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
 }
+void  plane2::hit() {
+	for (int i = 0; i < 21; i++) {
+		m_Colors[i] = vec4(1.0f, 0.8f, 0.8f, 1.0f);
+	}
+	
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
+	
+}
+void  plane2::hitB() {
+	
+		m_Colors[0] = vec4(0.3f, 0.7f, 0.7f, 1.0f);
+		m_Colors[1] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
+		m_Colors[2] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
+		m_Colors[3] = vec4(0.3f, 0.7f, 0.7f, 1.0f);
+		m_Colors[4] = vec4(0.98f, 0.58f, 0.44f, 1.0f);
+		m_Colors[5] = vec4(0.88f, 0.48f, 0.24f, 1.0f);
+		m_Colors[6] = vec4(0.3f, 0.7f, 0.7f, 1.0f);
+		m_Colors[7] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
+		m_Colors[8] = vec4(0.88f, 0.48f, 0.24f, 1.0f);
+		m_Colors[9] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
+		m_Colors[10] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
+		m_Colors[11] = vec4(0.88f, 0.48f, 0.24f, 1.0f);
+		m_Colors[12] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
+		m_Colors[13] = vec4(0.88f, 0.48f, 0.24f, 1.0f);
+		m_Colors[14] = vec4(0.88f, 0.48f, 0.24f, 1.0f);
+		m_Colors[15] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
+		m_Colors[16] = vec4(1.0f, 0.1f, 0.05f, 1.0f);
+		m_Colors[17] = vec4(1.0f, 0.8f, 0.2f, 1.0f);
+		m_Colors[18] = vec4(0.88f, 0.48f, 0.24f, 1.0f);
+		m_Colors[19] = vec4(1.0f, 0.1f, 0.05f, 1.0f);
+		m_Colors[20] = vec4(1.0f, 0.8f, 0.2f, 1.0f);  // (r, g, b, a)
+		printf("LMAO");
+	
+	
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
 
+}
 void plane2::SetColor(GLfloat vColor[4])
 {
 	for( int i = 0 ; i < 6 ; i++ ) {
