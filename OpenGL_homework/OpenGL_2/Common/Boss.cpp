@@ -66,9 +66,11 @@ void Boss::BossK() {
 		m_Points[3 * i] = vec4(0, 0, 0, 1.0f);
 		m_Points[3 * i + 1] = vec4(1.2f *RADIUS * cosf(M_PI*2.0f* i / corner), 1.2f * RADIUS * sinf(M_PI*2.0f* i / corner), 0, 1.0f);
 		m_Points[3 * i + 2] = vec4(0.7f*RADIUS * cosf(M_PI*2.0f* (i + 1) / corner), 0.7f * RADIUS * sinf(M_PI*2.0f* (i + 1) / corner), 0, 1.0f);
-
+		
 	}
-	
+	for (int i = 3 * corner; i >= 3 * corner&& i<45; i++){
+		m_Points[i]= vec4(0.0f, 0.0, 0.0, 1.0);
+}
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_Points), m_Points);

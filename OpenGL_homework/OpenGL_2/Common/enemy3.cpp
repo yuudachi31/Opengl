@@ -15,7 +15,7 @@ enemy3::enemy3()
 	{
 		m_Colors[i]= vec4(1.0f, 1.0f, 1.0f, 0.5f);
 	}
-	EnemyHealth =70;//Enemy¦å¶q
+	EnemyHealth =30;//Enemy¦å¶q
 	/*m_Colors[0] = vec4(3.2f, 2.0f, 1.5f, 1.0);
 	for (int i = 1; i <= CornerNUM + 1; i++)
 	{

@@ -27,7 +27,48 @@ enemy::enemy()
 	 EnemyHealth = 6;//Enemy¦å¶q
 }
 
+void  enemy::hit() {
+	for (int i = 0; i < 21; i++) {
+		m_Colors[i] = vec4(1.0f, 0.8f, 0.8f, 1.0f);
+	}
 
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
+
+}
+void  enemy::hitB() {
+
+	m_Colors[0] = vec4(1.7f, 0.2f, 0.4f, 1.0);
+	for (int i = 1; i <= CornerNUM + 1; i++)
+	{
+		m_Colors[i] = vec4(i*0.1f + 0.1f, 1.0f / i, 1.0f, 0.5f);
+	}
+	printf("LMAO");
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
+
+}
+void enemy::Change1(){
+	m_Colors[0] = vec4(1.7f, 0.2f, 0.4f, 1.0);
+	for (int i = 1; i <= CornerNUM + 1; i++)
+	{
+		m_Colors[i] = vec4(i*0.1f + 0.1f, 1.0f / i, 1.0f, 0.5f);
+
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
+}
+void enemy::Change2() {
+	m_Colors[0] = vec4(1.7f, 0.2f, 0.4f, 1.0);
+	for (int i = 1; i <= CornerNUM + 1; i++)
+	{
+		m_Colors[i] = vec4(i*0.5f + 1.5f, 1.0f / 2*i, 1.0f, 0.5f);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiBuffer);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(m_Points), sizeof(m_Colors), m_Colors);
+}
 void enemy::CreateBufferObject()
 {
     glGenVertexArrays( 1, &m_uiVao );

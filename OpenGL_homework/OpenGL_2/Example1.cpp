@@ -88,12 +88,12 @@ void CreateEnemy();
 void EnemyAnimate(float dt);
 void CreateEnemy2();
 void CreateEnemy3();
-void CreateBackground();
-void CreateBullet();
-void CreateBoss();
-void BossShoot();
-void Eshoot();
-void Mshoot();
+void CreateBackground();  //背景生成
+void CreateBullet();  //子彈生成
+void CreateBoss();  //BOSS生成
+void BossShoot();  //BOSS發射
+void Eshoot();   //敵人發射
+void Mshoot();  //導彈
 
 void init( void )
 {
@@ -139,8 +139,15 @@ void EnemyMoving(float dt) {
 				EnemyLoc[i][0] = -12.0f;
 			}
 			if (Enemy1[i]->EnemyHealth == 0) {
-				EnemyLoc[i][1] += 28.0f;
+				
 				Enemy1[i]->EnemyHealth = 5;
+				if (EnemyLoc[i][0] < 0) {
+					Enemy1[i]->Change1();
+				}
+				if (EnemyLoc[i][0] > 0) {
+					Enemy1[i]->Change2();
+				}
+				EnemyLoc[i][1] += 20.0f;
 			}
 			Enemyvec[i] = vec4(EnemyLoc[i][0], EnemyLoc[i][1], 0, 0);
 		EnemyTrans = Translate(Enemyvec[i]);
@@ -578,12 +585,14 @@ void HitOrNot(float dt) {
 				}
 			}
 			for (int i = 0; i < 2; i++) {
-				if (pget->Loc.x < Enemy3Loc[i][0] + 0.7f && pget->Loc.x  > Enemy3Loc[i][0] - 0.7f && pget->Loc.y > Enemy3Loc[i][1] - 0.7f&&pget->Loc.y < Enemy3Loc[i][1] + 0.7f)
-				{
-					Fire(pget->Loc.x, pget->Loc.y);
-					pget->Exact = false; printf("hit""\n");
-					Enemy3[i]->EnemyHealth -= 1;
-					if (Enemy3[i]->EnemyHealth < 0) { E3L[i] = false; }
+				if (E3L[i] == true) {
+					if (pget->Loc.x < Enemy3Loc[i][0] + 0.7f && pget->Loc.x  > Enemy3Loc[i][0] - 0.7f && pget->Loc.y > Enemy3Loc[i][1] - 0.7f&&pget->Loc.y < Enemy3Loc[i][1] + 0.7f)
+					{
+						Fire(pget->Loc.x, pget->Loc.y);
+						pget->Exact = false; printf("hit""\n");
+						Enemy3[i]->EnemyHealth -= 1;
+						if (Enemy3[i]->EnemyHealth < 0) { E3L[i] = false; }
+					}
 				}
 			}
 			if (pget->Loc.x < boss1->Bx + 2.0f && pget->Loc.x  > boss1->Bx - 2.0f && pget->Loc.y > boss1->By - 2.0f && pget->Loc.y < boss1->By + 2.0f) {
